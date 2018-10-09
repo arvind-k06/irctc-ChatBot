@@ -1,1 +1,1 @@
-web: python manage.py
+web: gunicorn irctc.wsgi:application --log-file -

@@ -1,15 +1,17 @@
 import json
 import requests
 import urllib.request
-# from django.db import connection
+import webbrowser
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.http import HttpResponse, JsonResponse
 
+
 @api_view(['POST'])
 def train(request):
     if request.method == 'POST':
-        api = 'l3l2o07acw'
+        api = 'h6crp8qzd5'
+        api1 = '3d5e5bb1461821f62c74fd85c78734bb'
         try:
             data = json.loads(request.body.decode('utf-8'))
             param = data['queryResult']['parameters']
@@ -28,8 +30,8 @@ def train(request):
                 trains = (c["trains"])
                 tes = ""
                 for i in trains:
-                    tes = tes + i['name'] + " and train number is " + i['number'] + ","
-
+                    tes = tes + str(i['name']) + "(" + i['number'] + "),"
+                print(tes)
                 s = {
                     "fulfillmentText" : "This is a sample response from your webhook!",
                     "fulfillmentMessages" :[{"text":{ "text": [tes]}}],"source" : ""}
@@ -212,6 +214,77 @@ def train(request):
                         tes = "Yes, Train numbered "+num+" is Cancelled"
                 print(tes)
 
+                s = {
+                    "fulfillmentText" : "This is a sample response from your webhook!",
+                    "fulfillmentMessages" :[{"text":{ "text": [tes]}}],"source" : ""}
+                return JsonResponse(s, safe=False)
+            elif action == 'SpecialTrains':
+                print(param)
+                req = 'https://indianrailapi.com/api/v2/SpecialTrains/apikey/'+ api1 +'/'
+                print(req)
+                r = requests.get(req)
+                c = json.loads(r.content.decode("utf-8"))
+                # print(c)
+                trains = (c["Trains"])
+                print(trains)
+                tes = ""
+                for i in trains:
+                    tes = tes + str(i['TrainName']).title() + "( " + i['TrainNumber'] + ')  ,'
+                print(tes)
+                s = {
+                    "fulfillmentText" : "This is a sample response from your webhook!",
+                    "fulfillmentMessages" :[{"text":{ "text": [tes]}}],"source" : ""}
+                return JsonResponse(s, safe=False)
+
+
+            elif action == 'StationLocationOnMap':
+                print(param)
+                req = 'https://indianrailapi.com/api/v2/StationLocationOnMap/apikey/'+ api1 +'/StationCode/'+ str(param['source'])
+                print(req)
+                r = requests.get(req)
+                c = json.loads(r.content.decode("utf-8"))
+                print(c)
+                url = (c['URL'])
+                webbrowser.open(url)
+                tes = "you have been redirected to the google maps"
+                # for i in trains:
+                #     tes = tes + str(i['TrainName']) + " and train number is " + i['TrainNumber'] + ','
+                # print(tes)
+                s = {
+                    "fulfillmentText" : "This is a sample response from your webhook!",
+                    "fulfillmentMessages" :[{"text":{ "text": [tes]}}],"source" : ""}
+                return JsonResponse(s, safe=False)
+            elif action == 'ShatabdiTrains':
+                print(param)
+                req = 'https://indianrailapi.com/api/v2/ShatabdiTrains/apikey/'+ api1 +'/'
+                print(req)
+                r = requests.get(req)
+                c = json.loads(r.content.decode("utf-8"))
+                print(c)
+                trains = (c["Trains"])
+                print(trains)
+                tes = ""
+                for i in trains:
+                    tes = tes + str(i['TrainName']).title() + "( " + i['TrainNumber'] + ')  ,'
+                print(tes)
+                s = {
+                    "fulfillmentText" : "This is a sample response from your webhook!",
+                    "fulfillmentMessages" :[{"text":{ "text": [tes]}}],"source" : ""}
+                return JsonResponse(s, safe=False)
+
+            elif action == 'CoachLayout':
+                print(param)
+                num = int(param['number'])
+                req = 'https://indianrailapi.com/api/v2/CoachLayout/apikey/'+ api1 +'/TrainNumber/' + str(num)
+                print(req)
+                r = requests.get(req)
+                c = json.loads(r.content.decode("utf-8"))
+                print(c)
+                coaches = (c["Coaches"])
+                tes = ""
+                for i in coaches:
+                    tes = tes + str(i['SerialNo']) + "->" + i['Code'] + ' ,'
+                print(tes)
                 s = {
                     "fulfillmentText" : "This is a sample response from your webhook!",
                     "fulfillmentMessages" :[{"text":{ "text": [tes]}}],"source" : ""}
